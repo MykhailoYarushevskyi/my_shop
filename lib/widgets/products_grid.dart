@@ -14,6 +14,7 @@ class ProductsGrid extends StatelessWidget {
     // final productsData = Provider.of<Products>(context);
     final productsData = context.watch<Products>();
     final products = productsData.items;
+    print('## ProductsGrid.build()');
     return GridView.builder(
       padding: EdgeInsets.all(10.0),
       // itemBuilder: (context, index) => ChangeNotifierProvider(
