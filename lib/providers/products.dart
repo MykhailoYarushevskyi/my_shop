@@ -23,7 +23,8 @@ class Products with ChangeNotifier {
     Product(
       id: 'p3',
       title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
+      description:
+          'Warm and cozy - exactly what you need for the winter.\',111111111111111111111111111111111122222222222222222222222222222222222233333333333333333333333333333333333333333444444444444444444444444444444444444445555555555555555555555555555555555555555555555555555555555555555555666666666666666666666666777777777777777777777777777888888888888888888888888888888888888888999999999999999999999999999999999990000000000000000000000000000000000!',
       price: 19.99,
       imageUrl:
           'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
@@ -37,13 +38,13 @@ class Products with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];
-  bool _showFavoritesOnly = false;
 
   List<Product> get items {
-    if (_showFavoritesOnly) {
-      return _items.where((product) => product.isFavorite == true).toList();
-    }
     return [..._items];
+  }
+
+  List<Product> get favoriteItems {
+    return _items.where((product) => product.isFavorite == true).toList();
   }
 
   Product findById(id) {
@@ -52,16 +53,6 @@ class Products with ChangeNotifier {
 
   void addProduct() {
     // _items.add(value);
-    notifyListeners();
-  }
-
-  void showFavoritesOnly() {
-    _showFavoritesOnly = true;
-    notifyListeners();
-  }
-
-  void showAll() {
-    _showFavoritesOnly = false;
     notifyListeners();
   }
 }
