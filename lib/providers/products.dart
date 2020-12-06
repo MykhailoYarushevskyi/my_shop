@@ -47,12 +47,44 @@ class Products with ChangeNotifier {
     return _items.where((product) => product.isFavorite == true).toList();
   }
 
-  Product findById(id) {
+  Product findById(String id) {
     return _items.firstWhere((item) => item.id == id);
   }
 
-  void addProduct() {
-    // _items.add(value);
+  void addProduct(Product product) {
+    final newProduct = Product(
+      id: DateTime.now().toString(),
+      // id: product.id,
+      title: product.title,
+      price: product.price,
+      description: product.description,
+      imageUrl: product.imageUrl,
+      isFavorite: product.isFavorite,
+    );
+    _items.add(newProduct);
+    // _items.add(product);
+    // _items.insert(0, newProduct); //at the start of the list
+    notifyListeners();
+  }
+
+  void updateProduct(String id, Product newProduct) {
+    if (id != null && newProduct.id != null) {
+      final productIndex = _items.indexWhere((product) => product.id == id);
+      // _items.removeWhere((item) => item.id == id);
+      if (productIndex >= 0) {
+        _items[productIndex] = newProduct;
+        // _items.insert(indexProduct, newProduct);
+        notifyListeners();
+      } else {
+        print('##[E] updateProduct Error: productIndex is less than 0');
+      }
+    } else {
+      print('##[E] updateProduct Error: id or newProduct.id is null');
+    }
+  }
+
+  void deleteProduct(String id) {
+    if (id != null) _items.removeWhere((product) => product.id == id);
     notifyListeners();
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import '../providers/products.dart';
 import '../providers/product.dart';
-import '../providers/cart.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   // final String title;
@@ -31,34 +32,6 @@ class ProductDetailScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text(loadedProduct.title),
-      ),
-      bottomNavigationBar: GestureDetector(
-        child: Container(
-          padding: EdgeInsets.all(20),
-          margin: EdgeInsets.only(
-            left: 15,
-            right: 15,
-            bottom: 10,
-            top: 5,
-          ),
-          color: Theme.of(context).backgroundColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Add to cart'),
-              SizedBox(width: 10),
-              Icon(Icons.shopping_cart),
-            ],
-          ),
-        ),
-        onTap: () {
-          Cart cart = context.read<Cart>();
-          cart.addItem(
-            loadedProduct.id,
-            loadedProduct.price,
-            loadedProduct.title,
-          );
-        },
       ),
       body: SingleChildScrollView(
         child: Column(

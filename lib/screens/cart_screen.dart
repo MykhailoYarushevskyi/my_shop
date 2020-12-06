@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +14,7 @@ class CartScreen extends StatelessWidget {
     BuildContext context, {
     String message = '',
     Color textColor = Colors.black,
-    Duration duration,
+    Duration seconds,
   }) {
     Scaffold.of(context).showSnackBar(
       SnackBar(
@@ -37,6 +36,7 @@ class CartScreen extends StatelessWidget {
             ),
           ),
         ),
+        duration: seconds,
       ),
     );
   }
@@ -84,17 +84,17 @@ class CartScreen extends StatelessWidget {
                               );
                           cart.clear();
                           showMessage(context,
-                              message: 'Your Cart was added to the Orders',
+                              message: 'Cart added to orders',
                               textColor:
                                   Theme.of(context).textTheme.headline6.color,
-                              duration: Duration(seconds: 2));
+                              seconds: Duration(seconds: 2));
                         } else
                           // calling showSnackBar():
                           showMessage(context,
                               message:
-                                  'Your Cart is EMPTY. Please, fill up your Cart.',
+                                  'Your сart is EMPTY. Please, fill up your сart.',
                               textColor: Theme.of(context).errorColor,
-                              duration: Duration(seconds: 2));
+                              seconds: Duration(seconds: 2));
                       },
                     ),
                   ),

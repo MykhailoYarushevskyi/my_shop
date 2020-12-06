@@ -31,14 +31,14 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         actions: <Widget>[
           Consumer<Cart>(
             builder: (context, cart, childWidget) {
-              print('## cart.itemCount = ${cart.itemCount}');
+              // print('## ProductsOverviewScreen cart.itemCount = ${cart.itemCount}');
               return Badge(
                 // key: Key('123'),
                 value: cart.itemCount.toString(),
                 child: childWidget,
               );
             },
-            //childWidget
+            //it will childWidget in builder:
             child: IconButton(
               icon: Icon(Icons.shopping_cart),
               onPressed: () =>

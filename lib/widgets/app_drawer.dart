@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:my_shop/screens/user_products_screen.dart';
 import '../screens/orders_screen.dart';
 import '../screens/products_overview_screen.dart';
 
@@ -10,21 +11,28 @@ class AppDrawer extends StatelessWidget {
     String title,
     Function tapHandler,
   }) {
-    return ListTile(
-      leading: Icon(
-        iconData,
-        size: 26,
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 24,
-          fontFamily: 'Lato',
-          fontWeight: FontWeight.w700,
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(
+            iconData,
+            size: 26,
+          ),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontFamily: 'Lato',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          onTap: tapHandler,
         ),
-      ),
-      onTap: tapHandler,
+        Divider(
+          thickness: 3,
+        ),
+      ],
     );
   }
 
@@ -73,18 +81,12 @@ class AppDrawer extends StatelessWidget {
             ),
             duration: Duration(seconds: 1),
           ),
-          // Divider(
-          //   thickness: 3,
-          // ),
           _buildListTile(
             iconData: Icons.shopping_basket,
             title: 'Shop',
             tapHandler: () => Navigator.of(context).pushReplacementNamed(
               ProductsOverviewScreen.routeName,
             ),
-          ),
-          Divider(
-            thickness: 3,
           ),
           _buildListTile(
             iconData: Icons.payment,
@@ -94,8 +96,13 @@ class AppDrawer extends StatelessWidget {
               OrdersScreen.routeName,
             ),
           ),
-          Divider(
-            thickness: 3,
+          _buildListTile(
+            iconData: Icons.palette,
+            // iconData: Icons.list_rounded,
+            title: 'Manage Products',
+            tapHandler: () => Navigator.of(context).pushReplacementNamed(
+              UserProductsScreen.routeName,
+            ),
           ),
         ],
       ),

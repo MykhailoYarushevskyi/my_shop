@@ -8,13 +8,7 @@ class CartItem extends StatelessWidget {
   final double price;
   final int quantity;
   final String productId;
-  CartItem({
-    this.id,
-    this.title,
-    this.price,
-    this.quantity,
-    this.productId
-  });
+  CartItem({this.id, this.title, this.price, this.quantity, this.productId});
   @override
   Widget build(BuildContext context) {
     // final cart = context.watch<Cart>();
@@ -25,6 +19,33 @@ class CartItem extends StatelessWidget {
         context.read<Cart>().removeItem(productId);
         // or:
         // context.read<Cart>().removeItemByItemId(id);
+      },
+      confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Are you sure?',
+              textAlign: TextAlign.center,
+            ),
+            content: Text(
+              'Do you want to remove this item from the cart?',
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              FlatButton(
+                child: Text('No'),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              FlatButton(
+                child: Text('Yes'),
+                // onPressed: () => Navigator.pop(context, true),
+                //                  or
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ),
+        );
       },
       key: ValueKey(id),
       background: Container(
@@ -55,7 +76,7 @@ class CartItem extends StatelessWidget {
                 padding: const EdgeInsets.all(3.0),
                 child: FittedBox(
                   // fit: BoxFit.scaleDown,
-                  child: Text('\$$price'),
+                  child: Text('\$${price.toStringAsFixed(2)}'),
                 ),
               ),
             ),
