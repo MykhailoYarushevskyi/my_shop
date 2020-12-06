@@ -69,11 +69,19 @@ class Products with ChangeNotifier {
 
   void updateProduct(String id, Product newProduct) {
     if (id != null && newProduct.id != null) {
-      final productIndex = _items.indexWhere((product) => product.id == id);
+      final productIndex = _items.indexWhere((prod) => prod.id == id);
       // _items.removeWhere((item) => item.id == id);
       if (productIndex >= 0) {
-        _items[productIndex] = newProduct;
-        // _items.insert(indexProduct, newProduct);
+        var updatedProduct = Product(
+          id: newProduct.id,
+          title: newProduct.title,
+          description: newProduct.description,
+          price: newProduct.price,
+          imageUrl: newProduct.imageUrl,
+          isFavorite: newProduct.isFavorite,
+        );
+        _items[productIndex] = updatedProduct;
+        // _items.insert(indexProduct, updatedProduct);
         notifyListeners();
       } else {
         print('##[E] updateProduct Error: productIndex is less than 0');

@@ -21,22 +21,26 @@ void main() {
           imageUrl: 'https//:image_holder/item_$number.jpg',
           isFavorite: true,
         );
-        expect(products.items.any((item) {
-          return item.title == product.title &&
-              item.description == product.description &&
-              item.price == product.price &&
-              item.imageUrl == product.imageUrl &&
-              item.isFavorite == product.isFavorite;
-        }), false);
-        products.addProduct(product);
         expect(
-            products.items.any((item) =>
-                item.title == product.title &&
+          products.items.any((item) {
+            return item.title == product.title &&
                 item.description == product.description &&
                 item.price == product.price &&
                 item.imageUrl == product.imageUrl &&
-                item.isFavorite == product.isFavorite),
-            true);
+                item.isFavorite == product.isFavorite;
+          }),
+          false,
+        );
+        products.addProduct(product);
+        expect(
+          products.items.any((item) =>
+              item.title == product.title &&
+              item.description == product.description &&
+              item.price == product.price &&
+              item.imageUrl == product.imageUrl &&
+              item.isFavorite == product.isFavorite),
+          true,
+        );
       }
       expect(products.items.length == initialQuantityProduct + maxNumberAdded,
           true);
@@ -55,13 +59,16 @@ void main() {
           imageUrl: 'https//:image_holder/item_$number.jpg',
           isFavorite: true,
         );
-        expect(products.items.any((item) {
-          return item.title == product.title &&
-              item.description == product.description &&
-              item.price == product.price &&
-              item.imageUrl == product.imageUrl &&
-              item.isFavorite == product.isFavorite;
-        }), false);
+        expect(
+          products.items.any((item) {
+            return item.title == product.title &&
+                item.description == product.description &&
+                item.price == product.price &&
+                item.imageUrl == product.imageUrl &&
+                item.isFavorite == product.isFavorite;
+          }),
+          false,
+        );
         products.addProduct(product);
         //added product with made id
         addedProduct = products.items.firstWhere((item) {
@@ -72,7 +79,7 @@ void main() {
               item.isFavorite == product.isFavorite;
         });
         //check the appear message Error 'updateProduct' because id is null
-        newProduct = Product(
+        var nullIdProduct = Product(
           id: product.id, //null
           title: product.title + '_updated',
           description: product.description + '_updated',
@@ -81,7 +88,7 @@ void main() {
               product.imageUrl.replaceFirst(new RegExp(r':'), ':_updated'),
           isFavorite: !product.isFavorite,
         );
-        products.updateProduct(product.id, newProduct);
+        products.updateProduct(product.id, nullIdProduct);
         //test with made id
         newProduct = Product(
           id: addedProduct.id, // real made id
@@ -102,14 +109,25 @@ void main() {
                 item.imageUrl == newProduct.imageUrl &&
                 item.isFavorite == newProduct.isFavorite),
             true);
-        //I check whether it is possible to damage the Product from the outside
-        //after the update
+        //check whether it is possible to damage the Product in Products
+        //from the outside after the update
         bool updatedProductIsFavorite = newProduct.isFavorite;
+        //try to damage the Product in Products
+        print(
+            '##[test] before damage newProduct.isFavorite = ${newProduct.isFavorite}');
         newProduct.isFavorite = !newProduct.isFavorite;
-        print('##[test] damaged newProduct.isFavorite = ${newProduct.isFavorite}');
-        var damageProduct =
+        print(
+            '##[test] damaged newProduct.isFavorite = ${newProduct.isFavorite}');
+        var possibleDamagedProduct =
             products.items.firstWhere((prod) => prod.id == newProduct.id);
-            expect(damageProduct.isFavorite && updatedProductIsFavorite, false);
+        print(
+            '##[test] possibleDamagedProduct.isFavorite = ${possibleDamagedProduct.isFavorite}');
+
+        //if true, the updated Product in Products was not damaged
+        expect(
+          possibleDamagedProduct.isFavorite == updatedProductIsFavorite,
+          true,
+        );
       }
       expect(products.items.length == initialQuantityProduct + maxNumberAdded,
           true);
