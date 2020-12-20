@@ -1,43 +1,47 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
-import 'product.dart';
+import 'package:http/http.dart' as http;
+
+import './product.dart';
+import '../models/Exceptions/http_exception.dart';
+import '../models/Exceptions/common_Exception.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _items = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description:
-          'Warm and cozy - exactly what you need for the winter.\',111111111111111111111111111111111122222222222222222222222222222222222233333333333333333333333333333333333333333444444444444444444444444444444444444445555555555555555555555555555555555555555555555555555555555555555555666666666666666666666666777777777777777777777777777888888888888888888888888888888888888888999999999999999999999999999999999990000000000000000000000000000000000!',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-  ];
+  List<Product> _items = [];
+  // Product(
+  //   id: 'p1',
+  //   title: 'Red Shirt',
+  //   description: 'A red shirt - it is pretty red!',
+  //   price: 29.99,
+  //   imageUrl:
+  //       'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
+  // ),
+  // Product(
+  //   id: 'p2',
+  //   title: 'Trousers',
+  //   description: 'A nice pair of trousers.',
+  //   price: 59.99,
+  //   imageUrl:
+  //       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
+  // ),
+  // Product(
+  //   id: 'p3',
+  //   title: 'Yellow Scarf',
+  //   description:
+  //       'Warm and cozy - exactly what you need for the winter.',
+  //   price: 19.99,
+  //   imageUrl:
+  //       'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
+  // ),
+  // Product(
+  //   id: 'p4',
+  //   title: 'A Pan',
+  //   description: 'Prepare any meal you want.',
+  //   price: 49.99,
+  //   imageUrl:
+  //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
+  // ),];
 
   List<Product> get items {
     return [..._items];
@@ -51,48 +55,194 @@ class Products with ChangeNotifier {
     return _items.firstWhere((item) => item.id == id);
   }
 
-  void addProduct(Product product) {
-    final newProduct = Product(
-      id: DateTime.now().toString(),
-      // id: product.id,
-      title: product.title,
-      price: product.price,
-      description: product.description,
-      imageUrl: product.imageUrl,
-      isFavorite: product.isFavorite,
-    );
-    _items.add(newProduct);
-    // _items.add(product);
-    // _items.insert(0, newProduct); //at the start of the list
-    notifyListeners();
+  Future<void> fetchAndSetProducts() async {
+    const url =
+        'https://my-shop-1362a-default-rtdb.firebaseio.com/products.json';
+    List<Product> _loadedProducts = [];
+    try {
+      final response = await http.get(url);
+      print(
+          '## Products.fetchAndSetProducts() response.body:\n${response.body}');
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      // List keyList = extractedData.keys.toList();
+      // for (int index = 0; index < keyList.length; index++) {
+      //   _loadedProducts.add(Product.fromJson(
+      //     id: keyList[index],
+      //     jsonMap: extractedData[keyList[index]],
+      //   ));
+      //            or:
+      extractedData.forEach((prodId, prodData) {
+        _loadedProducts.add(Product(
+          id: prodId,
+          description: prodData['description'],
+          title: prodData['title'],
+          price: double.parse(prodData['price'].toString()),
+          imageUrl: prodData['imageUrl'],
+          isFavorite: prodData['isFavorite'],
+        ));
+      });
+      _items = _loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      print('##[E] Products.fetchAndSetProducts() (catch block): Error $error');
+      throw (error);
+    }
+    // print('## Products.fetchAndSetProducts() keyList = $keyList');
+    // print(
+    //     '## Products.fetchAndSetProducts() wholeResponseMap = $wholeResponseMap');
+    // print('## Products.fetchAndSetProducts() _items = $_items');
+     finally {}
   }
 
-  void updateProduct(String id, Product newProduct) {
-    if (id != null && newProduct.id != null) {
-      final productIndex = _items.indexWhere((prod) => prod.id == id);
-      // _items.removeWhere((item) => item.id == id);
-      if (productIndex >= 0) {
-        var updatedProduct = Product(
-          id: newProduct.id,
-          title: newProduct.title,
-          description: newProduct.description,
-          price: newProduct.price,
-          imageUrl: newProduct.imageUrl,
-          isFavorite: newProduct.isFavorite,
-        );
-        _items[productIndex] = updatedProduct;
-        // _items.insert(indexProduct, updatedProduct);
-        notifyListeners();
-      } else {
-        print('##[E] updateProduct Error: productIndex is less than 0');
-      }
-    } else {
-      print('##[E] updateProduct Error: id or newProduct.id is null');
+  // addProduct(Product product) synchronous code:
+  // Future<void> addProduct(Product product) {
+  //   // const url =
+  //   //     'https://my-shop-1362a-default-rtdb.firebaseio.com/products.json';
+  //   const url =
+  //       'https://my-shop-1362a-default-rtdb.firebaseio.com/old-products.json';
+  //   return http
+  //       .post(url,
+  //           body: json.encode({
+  //             'title': product.title,
+  //             'description': product.description,
+  //             'price': product.price,
+  //             'imageUrl': product.imageUrl,
+  //             'isFavorite': product.isFavorite,
+  //           }))
+  //       .then((response) {
+  //     print('response.body = ${json.decode(response.body)}');
+  //     final newProduct = Product(
+  //       id: json.decode(response.body)['name'] as String,
+  //       title: product.title,
+  //       price: product.price,
+  //       description: product.description,
+  //       imageUrl: product.imageUrl,
+  //       isFavorite: product.isFavorite,
+  //     );
+  //     _items.add(newProduct);
+  //     print('newProduct.id = ${newProduct.id}');
+  //     // _items.add(product);
+  //     // _items.insert(0, newProduct); //at the start of the list
+  //     notifyListeners();
+  //     // then() method by defoult return Future<R>,
+  //     // therefore addProduct() will return Future<R>, in this case, Future<void>
+  //   }).catchError((error) {
+  //     print('##[E] ${error.toString()}');
+  //     throw(error);
+  //   });
+  // }
+
+  // addProduct(Product product) asynchronous code (always return Future)
+  Future<void> addProduct(Product product) async {
+    const url =
+        'https://my-shop-1362a-default-rtdb.firebaseio.com/products.json';
+    // const url =
+    //     'https://my-shop-1362a-default-rtdb.firebaseio.com/old-products.json';
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'title': product.title,
+            'description': product.description,
+            'price': product.price,
+            'imageUrl': product.imageUrl,
+            'isFavorite': product.isFavorite,
+          }));
+
+      print(
+          '## Products.addProduct(): response.body = ${json.decode(response.body)}');
+      final newProduct = Product(
+        id: json.decode(response.body)['name'] as String,
+        title: product.title,
+        price: product.price,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        isFavorite: product.isFavorite,
+      );
+      _items.add(newProduct);
+      print('## Products.addProduct(): newProduct.id = ${newProduct.id}');
+      // _items.add(product);
+      // _items.insert(0, newProduct); //at the start of the list
+      notifyListeners();
+      // then() method by defoult return Future<R>,
+      // therefore addProduct() will return Future<R>, in this case, Future<void>
+    } catch (error) {
+      print('##[E] Products.addProduct(): ${error.toString()}');
+      throw (error);
     }
   }
 
-  void deleteProduct(String id) {
-    if (id != null) _items.removeWhere((product) => product.id == id);
+  Future<void> updateProduct(String id, Product newProduct) async {
+    final url =
+        'https://my-shop-1362a-default-rtdb.firebaseio.com/products/$id.json';
+    if (id != null && newProduct.id != null) {
+      final productIndex = _items.indexWhere((prod) => prod.id == id);
+      if (productIndex >= 0) {
+        try {
+          final response = await http.patch(url,
+              body: json.encode({
+                'title': newProduct.title,
+                'description': newProduct.description,
+                'price': newProduct.price,
+                'imageUrl': newProduct.imageUrl,
+                'isFavorite': newProduct.isFavorite, 
+              }));
+          print('## Products.updateProduct() try block. statusCode: ${response.statusCode}');
+          if(response.statusCode >= 400){
+            throw HttpException('statusCode = ${response.statusCode}');
+          }
+          _items[productIndex] = newProduct;
+          notifyListeners();
+          // _items.insert(indexProduct, updatedProduct);
+        } catch (error) {
+          print('##[E] Products.updateProduct() catch: Error: $error');
+          throw error;
+        }
+      } else {
+        print(
+            '##[E] Products.updateProduct() Error: productIndex is less than 0');
+      }
+    } else {
+      print(
+          '##[E] Products.updateProduct() Error: id or newProduct.id is null');
+    }
+  }
+
+
+
+  // Deleting - Optimistic updating pattern:
+  Future<void> deleteProduct(String id) async {
+    final url =
+        'https://my-shop-1362a-default-rtdb.firebaseio.com/products/$id.json';
+    if (id == null) {
+      print(
+          '##[E] Products.deleteProduct() Error: CommonException Error: id = null.');
+      throw CommonException('Poduct id = null. Could not delete the product.');
+    }
+    final existingProductIndex =
+        _items.indexWhere((product) => product.id == id);
+    var existingProduct = _items[existingProductIndex];
+
+    _items.removeWhere((product) => product.id == id);
     notifyListeners();
+    try {
+      final response = await http.delete(url);
+      print(
+          '## Products.deleteProduct() response.statusCode = ${response.statusCode}');
+      if (response.statusCode >= 400) {
+        _items.insert(existingProductIndex, existingProduct);
+        notifyListeners();
+        //   print(
+        //       '##[E] Products.deleteProduct() then(): Error #${response.statusCode}');
+        throw HttpException('Could not delete the product.');
+      }
+    } catch (error) {
+      //exceptions that unhandled above, for example, 
+      //unavailable internet connection (errno = 7)
+      print('##[E] Products.deleteProduct() catch clock. Error: $error');
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw error;
+    }
+    existingProduct = null;
   }
 }

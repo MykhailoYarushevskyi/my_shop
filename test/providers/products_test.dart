@@ -5,11 +5,11 @@ import 'package:my_shop/providers/product.dart';
 
 void main() {
   group('App Provider/Products Tests.', () {
-    int initialQuantityProduct = 4;
-    int maxNumberAdded = 3;
-    int maxNumberUpdated = 3;
+    int initialQuantityProduct = 0;
+    int maxNumberAdded = 2;
+    int maxNumberUpdated = 2;
 
-    test('A item(s) should be added', () {
+    test('A item(s) should be added', () async{
       var products = Products();
       expect(products.items.length == initialQuantityProduct, true);
       for (int number = 0; number < maxNumberAdded; number++) {
@@ -31,7 +31,7 @@ void main() {
           }),
           false,
         );
-        products.addProduct(product);
+        await products.addProduct(product);
         expect(
           products.items.any((item) =>
               item.title == product.title &&
@@ -45,7 +45,7 @@ void main() {
       expect(products.items.length == initialQuantityProduct + maxNumberAdded,
           true);
     });
-    test('the item(s) should be updated', () {
+    test('the item(s) should be updated', () async{
       var products = Products();
       var newProduct;
       var addedProduct;
@@ -69,7 +69,7 @@ void main() {
           }),
           false,
         );
-        products.addProduct(product);
+        await products.addProduct(product);
         //added product with made id
         addedProduct = products.items.firstWhere((item) {
           return item.title == product.title &&
@@ -88,6 +88,7 @@ void main() {
               product.imageUrl.replaceFirst(new RegExp(r':'), ':_updated'),
           isFavorite: !product.isFavorite,
         );
+        print('##[test] Null product\'s id Test. We expect appear warning: ##[E] Products.updateProduct() Error: id or newProduct.id is null');
         products.updateProduct(product.id, nullIdProduct);
         //test with made id
         newProduct = Product(
@@ -96,7 +97,7 @@ void main() {
           description: addedProduct.description + '_updated',
           price: addedProduct.price + 100.00,
           imageUrl:
-              addedProduct.imageUrl.replaceFirst(new RegExp(r':'), ':_updated'),
+              addedProduct.imageUrl.replaceFirst(new RegExp(r':'), ':_updated_'),
           isFavorite: !addedProduct.isFavorite,
         );
         products.updateProduct(addedProduct.id, newProduct);

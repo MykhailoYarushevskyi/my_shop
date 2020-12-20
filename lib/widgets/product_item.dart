@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
+import '../providers/products.dart';
 import '../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scaffoldOf = Scaffold.of(context);
     final product = Provider.of<Product>(context, listen: false);
     print('## ProductItem.build() rebuilds');
     return ClipRRect(
@@ -43,7 +45,24 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 ),
-                onPressed: () => {product.toggleFavoriteStatus()},
+                onPressed: () async {
+                  product.toggleFavoriteStatus();
+                  try {
+                    await context
+                        .read<Products>()
+                        .updateProduct(product.id, product);
+                  } catch (error) {
+                    product.toggleFavoriteStatus();
+                    scaffoldOf.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Updeting failed.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                },
                 color: Theme.of(context).accentColor),
           ),
           title: Text(

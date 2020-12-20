@@ -12,6 +12,20 @@ class CartItemData {
     @required this.quantity,
     @required this.price,
   });
+@override
+String toString()
+{
+  return '\nCartItemData: id = $id, title = $title, quantity = $quantity, price = $price\n';
+}
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "title": title,
+      "quantity": quantity,
+      "price": price,
+    };
+  }
 }
 
 class Cart with ChangeNotifier {
@@ -34,6 +48,7 @@ class Cart with ChangeNotifier {
   }
 
   void addItem(String productId, double price, String title) {
+    print('## Cart.addItem() productId: $productId');
     if (_items.containsKey(productId)) {
       // change the quantity:
       // _items[productId].quantity += 1; //works normally
@@ -51,7 +66,7 @@ class Cart with ChangeNotifier {
       _items.putIfAbsent(
         productId,
         () => CartItemData(
-            id: DateTime.now().toString(),
+            id: productId,
             title: title,
             quantity: 1,
             price: price),

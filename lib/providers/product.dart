@@ -19,4 +19,22 @@ class Product with ChangeNotifier {
     isFavorite = !isFavorite;
     notifyListeners();
   }
+
+  factory Product.fromJson({
+    String id,
+    Map<String, dynamic> jsonMap,
+  }) =>
+      Product(
+        id: id,
+        title: jsonMap['title'],
+        price: double.parse(jsonMap['price'].toString()),
+        description: jsonMap['description'],
+        imageUrl: jsonMap['imageUrl'],
+        isFavorite: jsonMap['isFavorite'],
+      );
+
+  @override
+  String toString() {
+    return '${super.toString()}: id: $id, title: $title, description: $description, price: $price, imageUrl: $imageUrl, isFavorite: $isFavorite';
+  }
 }
