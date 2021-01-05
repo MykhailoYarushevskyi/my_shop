@@ -12,11 +12,19 @@ class CartItemData {
     @required this.quantity,
     @required this.price,
   });
-@override
-String toString()
-{
-  return '\nCartItemData: id = $id, title = $title, quantity = $quantity, price = $price\n';
-}
+  @override
+  String toString() {
+    return '\nCartItemData: id = $id, title = $title, quantity = $quantity, price = $price\n';
+  }
+
+  static CartItemData fromJson(Map<String, dynamic> jsonMap) {
+    return CartItemData(
+      id: jsonMap['id'],
+      title: jsonMap['title'],
+      quantity: jsonMap['quantity'],
+      price: jsonMap['price'],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -66,10 +74,7 @@ class Cart with ChangeNotifier {
       _items.putIfAbsent(
         productId,
         () => CartItemData(
-            id: productId,
-            title: title,
-            quantity: 1,
-            price: price),
+            id: productId, title: title, quantity: 1, price: price),
       );
     }
     notifyListeners();

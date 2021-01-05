@@ -36,6 +36,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
   };
   var _isInit = true;
   var _isLoading = false;
+  var _isFormChanged = false;
+  var _isEditMode = false;
 
   @override
   void initState() {
@@ -49,6 +51,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (_isInit) {
       final productId = ModalRoute.of(context).settings.arguments as String;
       if (productId != null) {
+        _isEditMode =
+            true; //Using for a reaction about an attempt to exit from the form without a submitting of changes
         _editedProduct = context.read<Products>().findById(productId);
         //    or:
         //_editedProduct =
@@ -90,68 +94,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {});
     }
   }
-  // the code relative to the synchronous code of the addProduct():
-  // void _saveForm() {
-  //   // Products products = context.watch<Products>();
-  //   final bool isValid = _formGlobalKey.currentState.validate();
-  //   if (!isValid) return;
-  //   _formGlobalKey.currentState.save();
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   _editedProduct = Product(
-  //     id: _editedProduct.id,
-  //     title: _titleEdited,
-  //     price: _priceEdited,
-  //     description: _descriptionEdited,
-  //     imageUrl: _imageUrlEdited,
-  //     isFavorite: _editedProduct.isFavorite,
-  //   );
-  //   if (_editedProduct.id != null) {
-  //     //we can to use here either context.read<Products>() or
-  //     // Provider.of<Products>(context, listen: false)
-  //     context.read<Products>().updateProduct(
-  //           _editedProduct.id,
-  //           _editedProduct,
-  //         );
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     Navigator.of(context).pop();
-  //   } else {
-  //     Provider.of<Products>(context, listen: false)
-  //         .addProduct(_editedProduct)
-  //         .catchError((error) {
-  //       print('## EditProductScreen .catchError(eror)');
-  //       return showDialog<Null>(
-  //         context: context,
-  //         builder: (context) => AlertDialog(
-  //           actions: <Widget>[
-  //             FlatButton(
-  //               onPressed: () {
-  //                 Navigator.of(context).pop();
-  //               },
-  //               child: Text('Ok'),
-  //             ),
-  //           ],
-  //           title: Text('An Error occured'),
-  //           content: Text('Something go wrong'),
-  //         ),
-  //       );
-  //     }).then((_) {
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //       Navigator.of(context).pop();
-  //     });
-  //   }
-  //   print(_editedProduct.title);
-  //   print(_editedProduct.price);
-  //   print(_editedProduct.description);
-  //   print(_editedProduct.imageUrl);
-  // }
 
-  //the code relative to the asynchronous code of the addProduct():
   Future<void> _saveForm() async {
     // Products products = context.watch<Products>();
     final bool isValid = _formGlobalKey.currentState.validate();
@@ -197,8 +140,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 fontSize: 20,
               ),
             ),
-            content: Text(
-                'Something go wrong.\nMay be unavailable an internet connection'),
+            content: Text('Something go wrong.'),
           ),
         );
       }
@@ -228,8 +170,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 fontSize: 20,
               ),
             ),
-            content: Text(
-                'Something go wrong.\nMay be unavailable an internet connection'),
+            content: Text('Something go wrong.'),
           ),
         );
       }
@@ -244,6 +185,51 @@ class _EditProductScreenState extends State<EditProductScreen> {
       _isLoading = false;
     });
     Navigator.of(context).pop();
+  }
+
+  /// Callback that enables the form to veto attempts by the user
+  /// to dismiss the [ModalRoute] that contains the form.
+  Future<bool> _onFormWillPop() async {
+    print(
+        '## EditProductScreen _onFormWillPop() _isFormChanged: $_isFormChanged');
+    if (!_isFormChanged) {
+      return Future<bool>.value(true);
+    }
+    return await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(
+                'Do you want to exit?',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Theme.of(context).errorColor),
+              ),
+              content: _isEditMode
+                  ? Text(
+                      'If you will exit before submitting this form, you lose all changes that were made in the form!')
+                  : Text(
+                      'If you will exit before submitting this form, you lose all content of the form!'),
+              actions: [
+                FlatButton(
+                  color: Colors.red,
+                  onPressed: () => Navigator.of(context).pop<bool>(false),
+                  child: Text('Cancel'),
+                ),
+                RaisedButton(
+                  onPressed: () => Navigator.of(context).pop<bool>(true),
+                  child: Text('Yes'),
+                ),
+              ],
+            ));
+    // return Future<bool>.value(true);
+  }
+
+  /// Called when one of the form fields changes.
+  void _onFormChange() {
+    if (_isFormChanged)
+      return; //prevents Flutter from re-rendering all tree when Form was changed
+    setState(() {
+      _isFormChanged = true;
+    });
   }
 
   @override
@@ -265,6 +251,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: Form(
             // autovalidateMode: AutovalidateMode.always,
             key: _formGlobalKey,
+            onChanged: _onFormChange,
+            onWillPop: _onFormWillPop,
             child: ListView(
               children: <Widget>[
                 TextFormField(

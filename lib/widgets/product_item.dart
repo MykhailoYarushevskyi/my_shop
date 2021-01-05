@@ -4,13 +4,14 @@ import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
-import '../providers/products.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaffoldOf = Scaffold.of(context);
+    final authData = Provider.of<Auth>(context, listen: false);
     final product = Provider.of<Product>(context, listen: false);
     print('## ProductItem.build() rebuilds');
     return ClipRRect(
@@ -45,23 +46,17 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 ),
-                onPressed: () async {
-                  product.toggleFavoriteStatus();
-                  try {
-                    await context
-                        .read<Products>()
-                        .updateProduct(product.id, product);
-                  } catch (error) {
-                    product.toggleFavoriteStatus();
-                    scaffoldOf.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Updeting failed.',
-                          textAlign: TextAlign.center,
-                        ),
+                onPressed: () {
+                  product.toggleFavoriteStatus(authData.token, authData.userId).catchError((error) {
+                    print(
+                        '## ProductItem: toggleFavoriteStatus().catchError() = $error');
+                    scaffoldOf.showSnackBar(SnackBar(
+                      content: Text(
+                        'Toggle "favorite" failed.',
+                        textAlign: TextAlign.center,
                       ),
-                    );
-                  }
+                    ));
+                  });
                 },
                 color: Theme.of(context).accentColor),
           ),

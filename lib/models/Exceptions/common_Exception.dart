@@ -6,7 +6,7 @@ class CommonException implements Exception {
   String toString() {
     Object message = this.message;
     if (message == null) return "CommonException";
-    return "CommonException: $message";
+    return message;
   }
 
   // String toString() {

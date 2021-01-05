@@ -10,7 +10,7 @@ void main() {
     int maxNumberUpdated = 2;
 
     test('A item(s) should be added', () async{
-      var products = Products();
+      var products = Products('token', 'userId',[]);
       expect(products.items.length == initialQuantityProduct, true);
       for (int number = 0; number < maxNumberAdded; number++) {
         var product = Product(
@@ -46,7 +46,7 @@ void main() {
           true);
     });
     test('the item(s) should be updated', () async{
-      var products = Products();
+      var products = Products('token', 'userId',[]);
       var newProduct;
       var addedProduct;
       expect(products.items.length == initialQuantityProduct, true);

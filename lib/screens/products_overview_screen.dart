@@ -7,6 +7,7 @@ import '../widgets/products_grid.dart';
 import '../providers/cart.dart';
 import '../widgets/badge.dart';
 import '../screens/cart_screen.dart';
+import './error_content_screen.dart';
 
 enum FilterOptions {
   Favorits,
@@ -14,7 +15,7 @@ enum FilterOptions {
 }
 
 class ProductsOverviewScreen extends StatefulWidget {
-  static const String routeName = '/';
+  static const String routeName = '/products-overview';
   @override
   _ProductsOverviewScreenState createState() => _ProductsOverviewScreenState();
 }
@@ -51,7 +52,18 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
+            scrollable: true,
             actions: [
+              // Text('In more detail:'),
+              FlatButton(
+                child: Icon(Icons.help),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    ErrorContentScreen.routeName,
+                    arguments: error.toString(),
+                  );
+                },
+              ),
               FlatButton(
                   child: Text('Ok'),
                   onPressed: () {
@@ -68,8 +80,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 fontSize: 20,
               ),
             ),
-            content: Text(
-                'Something go wrong.\nMay be unavailable an internet connection'),
+            content: Text('Something go wrong.'),
           ),
         );
       });
@@ -93,12 +104,27 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         .catchError((error) {
       showDialog(
         context: context,
-        builder: (contect) => AlertDialog(
+        builder: (context) => AlertDialog(
+          scrollable: true,
           actions: [
+            // Text('In more detail:'),
             FlatButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Ok'),
-            )
+              child: Icon(Icons.help),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  ErrorContentScreen.routeName,
+                  arguments: error.toString(),
+                );
+              },
+            ),
+            FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  Navigator.of(context).pop();
+                }),
           ],
           title: Text(
             'An Error occured!',
@@ -107,9 +133,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
               fontSize: 20,
             ),
           ),
-          titlePadding: EdgeInsets.all(10),
-          content: Text(
-              'Something go wrong.\nMay be unavailable an internet connection'),
+          content: Text('Something go wrong.'),
         ),
       );
     });

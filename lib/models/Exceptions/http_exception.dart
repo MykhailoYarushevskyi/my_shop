@@ -6,7 +6,7 @@ class HttpException implements Exception {
   String toString() {
     Object message = this.message;
     if (message == null) return "HttpException";
-    return "HttpException: $message";
+    return message;
   }
 
   // String toString() {

@@ -28,42 +28,67 @@ class OrderItemData {
 
 class Orders with ChangeNotifier {
   List<OrderItemData> _orders = [];
+  final authToken;
+  final userId;
+
+  Orders(this.authToken, this.userId, this._orders);
 
   List<OrderItemData> get orders {
     return [..._orders];
   }
 
   Future<void> fetchAndSetOrders() async {
-    const url = 'https://my-shop-1362a-default-rtdb.firebaseio.com/orders.json';
+    final url = 'https://my-shop-1362a-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken';
     List<OrderItemData> _loadedOrders = [];
-
     try {
       final response = await http.get(url);
       // print('## Orders.fetchOrders() response.body: ${response.body}');
       final extructedData = json.decode(response.body) as Map<String, dynamic>;
+      if (extructedData == null) {
+        // orders on the server is empty
+        return;
+      }
+      if (extructedData.containsKey("error")) {
+        throw extructedData["error"];
+      }
       extructedData.forEach((orderId, order) {
         _loadedOrders.add(
           OrderItemData(
-            id: orderId,
-            amount: order["amount"],
-            dateTime: DateTime.fromMillisecondsSinceEpoch(order["dateTime"]),
-            products: List.generate(
-              order["products"].length,
-              (index) => CartItemData(
-                  id: order["products"][index]['id'],
-                  title: order["products"][index]['title'],
-                  quantity: order["products"][index]['quantity'],
-                  price: order["products"][index]['price']),
-            ),
-          ),
+              id: orderId,
+              amount: order["amount"],
+              dateTime: DateTime.parse(order["dateTime"]),
+              // products: List.generate(
+              //   order["products"].length,
+              //   (index) => CartItemData(
+              //       id: order["products"][index]['id'],
+              //       title: order["products"][index]['title'],
+              //       quantity: order["products"][index]['quantity'],
+              //       price: order["products"][index]['price']),
+              // ),
+
+              //      or:
+              // products: (order["products"] as List<dynamic>)
+              //     .map((item) => CartItemData(
+              //           id: item['id'],
+              //           title: item['title'],
+              //           quantity: item['quantity'],
+              //           price: item['price'],
+              //         ))
+              //     .toList(),
+
+              //           or:
+              products: (order["products"] as List<dynamic>)
+                  .map((item) => CartItemData.fromJson(item))
+                  .toList()),
         );
       });
-      _orders = _loadedOrders;
+      _orders = _loadedOrders.reversed.toList();
       notifyListeners();
       // print('## Orders.fetchOrders() extructedData: $extructedData');
       // print(
       //     '## Orders.fetchOrders() _orders[${_orders.length - 1}]: ${_orders[_orders.length - 1]}');
     } catch (error) {
+      print('##[E] Orders.fetchAndSetOrders() (catch (error)): Error: $error');
       throw error;
     }
   }
@@ -72,17 +97,26 @@ class Orders with ChangeNotifier {
     List<CartItemData> cartProducts,
     double total,
   ) async {
-    const url = 'https://my-shop-1362a-default-rtdb.firebaseio.com/orders.json';
+    final url = 'https://my-shop-1362a-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken';
     if (cartProducts.length <= 0) {
       throw CommonException('Cart is empty');
     }
-    final _dateTimeNowMilliswcondsSE = DateTime.now().millisecondsSinceEpoch;
+    // final _dateTimeNowMilliswcondsSE = DateTime.now().millisecondsSinceEpoch;
+    final timestamp = DateTime.now();
     final _body = json.encode({
       "amount": total,
-      "dateTime": _dateTimeNowMilliswcondsSE,
-      "products": cartProducts
+      "dateTime": timestamp.toIso8601String(),
+      "products":
+          cartProducts //CartItemData has toJson() method and json.encode() use it for encode
+      //               or directly:
+      // "products": cartProducts.map((cp) => {
+      //       "id": cp.id,
+      //       "title": cp.title,
+      //       "quantity": cp.quantity,
+      //       "price": cp.price,
+      //     }).toList()
     });
-    print('$_body');
+    // print('## Orders.addOrder _body: $_body');
     try {
       final response = await http.post(
         url,
@@ -98,7 +132,8 @@ class Orders with ChangeNotifier {
           amount: total,
           products: cartProducts,
           dateTime:
-              DateTime.fromMillisecondsSinceEpoch(_dateTimeNowMilliswcondsSE),
+              // DateTime.fromMillisecondsSinceEpoch(_dateTimeNowMilliswcondsSE),
+              timestamp,
         ),
       );
       notifyListeners();
@@ -108,8 +143,8 @@ class Orders with ChangeNotifier {
     }
   }
 
-  void clear() {
-    _orders = [];
-    notifyListeners();
-  }
+  // void clear() {
+  //   _orders = [];
+  //   notifyListeners();
+  // }
 }
