@@ -189,6 +189,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   /// Callback that enables the form to veto attempts by the user
   /// to dismiss the [ModalRoute] that contains the form.
+  /// If the callback returns a [Future] that resolves to [false],
+  /// the form's route will not be popped.
   Future<bool> _onFormWillPop() async {
     print(
         '## EditProductScreen _onFormWillPop() _isFormChanged: $_isFormChanged');
