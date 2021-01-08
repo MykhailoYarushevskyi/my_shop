@@ -117,7 +117,7 @@ class _AuthCardState extends State<AuthCard>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: Duration(milliseconds: 300),
     );
     _heightAnimation = Tween<Size>(
             begin: Size(double.infinity, 260.0),
@@ -128,7 +128,7 @@ class _AuthCardState extends State<AuthCard>
         curve: Curves.fastOutSlowIn,
       ),
     );
-    _heightAnimation.addListener(() => setState(() {}));
+    // _heightAnimation.addListener(() => setState(() {}));
   }
 
   @override
@@ -240,14 +240,23 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        // height: _authMode == AuthMode.Signup ? 320 : 260,
-        height: _heightAnimation.value.height,
-        constraints:
-            // BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
-            BoxConstraints(minHeight: _heightAnimation.value.height),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+      child: AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (context, ch) => Container(
+            // height: _authMode == AuthMode.Signup ? 320 : 260,
+            height: _heightAnimation.value.height,
+            constraints:
+                // BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+                BoxConstraints(minHeight: _heightAnimation.value.height),
+            width: deviceSize.width * 0.75,
+            padding: EdgeInsets.all(16.0),
+            child: ch),
+        //The widget that gives in the builder as the "ch:" argument.
+        //Everything inside of that container, so the text form fields
+        //and the buttons and so on will not re-render for every frame,
+        //will not be rebuilt for every frame but instead, only
+        //the container, so the height therefore will change on every
+        //frame and that's more efficient than re-rendering everything.
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
