@@ -33,10 +33,22 @@ class ProductItem extends StatelessWidget {
                   print('## ProductItem: Future.then() method. Value = $value'),
                 },
               ),
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
+          child: Hero(
+            // in general, that can be any tag you want,
+            // but it should be unique per image
+            tag: product.id,
+            child: FadeInImage(
+              placeholder: AssetImage(
+                'assets/images/product-placeholder.png',
+              ),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
+          // child: Image.network(
+          //   product.imageUrl,
+          //   fit: BoxFit.cover,
+          // ),
           // child: Icon(Icons.photo_library),
         ),
         footer: GridTileBar(
@@ -47,7 +59,9 @@ class ProductItem extends StatelessWidget {
                   product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 ),
                 onPressed: () {
-                  product.toggleFavoriteStatus(authData.token, authData.userId).catchError((error) {
+                  product
+                      .toggleFavoriteStatus(authData.token, authData.userId)
+                      .catchError((error) {
                     print(
                         '## ProductItem: toggleFavoriteStatus().catchError() = $error');
                     scaffoldOf.showSnackBar(SnackBar(

@@ -110,9 +110,9 @@ class _AuthCardState extends State<AuthCard>
   var _isLoading = false;
   final _passwordController = TextEditingController();
   AnimationController _controller;
-  Animation<Size> _heightAnimation;
   Animation<double> _opasityAnimation;
   Animation<Offset> _slideAnimation;
+  // Animation<Size> _heightAnimation;
 
   @override
   void initState() {
@@ -121,6 +121,7 @@ class _AuthCardState extends State<AuthCard>
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
+    // for the manual animation of container's height
     // _heightAnimation = Tween<Size>(
     //         begin: Size(double.infinity, 260.0),
     //         end: Size(double.infinity, 320.0))
@@ -155,6 +156,20 @@ class _AuthCardState extends State<AuthCard>
   void dispose() {
     super.dispose();
     _controller.dispose();
+  }
+
+  void _switchAuthMode() {
+    if (_authMode == AuthMode.Login) {
+      setState(() {
+        _authMode = AuthMode.Signup;
+      });
+      _controller.forward();
+    } else {
+      setState(() {
+        _authMode = AuthMode.Login;
+      });
+      _controller.reverse();
+    }
   }
 
   void _showErrorDialog(String message) {
@@ -234,20 +249,6 @@ class _AuthCardState extends State<AuthCard>
     setState(() {
       _isLoading = false;
     });
-  }
-
-  void _switchAuthMode() {
-    if (_authMode == AuthMode.Login) {
-      setState(() {
-        _authMode = AuthMode.Signup;
-      });
-      _controller.forward();
-    } else {
-      setState(() {
-        _authMode = AuthMode.Login;
-      });
-      _controller.reverse();
-    }
   }
 
   @override
