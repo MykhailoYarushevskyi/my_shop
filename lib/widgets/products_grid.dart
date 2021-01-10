@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart.';
 import 'package:provider/provider.dart';
+
 import 'product_item.dart';
 import '../providers/products.dart';
 
@@ -15,7 +16,13 @@ class ProductsGrid extends StatelessWidget {
     // to [watch], but doesn't make widgets rebuild if the value obtained changes).
 
     // final productsData = Provider.of<Products>(context);
-
+    final MediaQueryData mediaQueryData = MediaQuery.of(context, nullOk: true);
+    Orientation orientation;
+    if (mediaQueryData != null) {
+      orientation = mediaQueryData.orientation;
+    } else {
+      orientation = Orientation.portrait;
+    }
     final productsData = context.watch<Products>();
     final products =
         showOnlyFavorites ? productsData.favoriteItems : productsData.items;
@@ -35,7 +42,7 @@ class ProductsGrid extends StatelessWidget {
       ),
       itemCount: products.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: orientation == Orientation.portrait ? 2 : 4,
         childAspectRatio: 3 / 2,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
