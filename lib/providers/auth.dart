@@ -3,10 +3,12 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/Exceptions/http_exception.dart';
+import '../models/Exceptions/common_Exception.dart';
 
 class Auth with ChangeNotifier {
   String
@@ -45,9 +47,17 @@ class Auth with ChangeNotifier {
   Future<void> _authenticate(
     String email,
     String password,
-    String url,
+    String urlWithoutApiKey,
   ) async {
     try {
+      final String apiKey =
+          await rootBundle.loadString('assets/text_files/fb_api_key.txt');
+      apiKey.trim();
+      if (apiKey == null) {
+        throw CommonException('do not loaded Api Key from assets.');
+      }
+      final url = urlWithoutApiKey + apiKey;
+      print('## Auth _authenticate() (apiKey): $apiKey; (url): $url');
       final response = await http.post(
         url,
         body: json.encode({
@@ -150,13 +160,13 @@ class Auth with ChangeNotifier {
   ///  for more information: https://firebase.google.com/docs/reference/rest/auth
   ///
   Future<void> signUp({String email, String password}) async {
-    //Auth signupNewUser endpoint.
-    const url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCdkQWVmoOOfSvD4OVlOvuqF2h0N1w03aQ';
+    //Auth signupNewUser endpoint without the API_KEY.
+    const urlWithoutApiKey =
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=';
     return _authenticate(
       email,
       password,
-      url,
+      urlWithoutApiKey,
     );
     //     .then((resp) {
     //   Map<String, dynamic> responseData = json.decode(resp.body);
@@ -227,12 +237,13 @@ class Auth with ChangeNotifier {
   /// associated with the existing email/password account.
 
   Future<void> signIn({String email, String password}) async {
-    //Auth signInWithPassword endpoint.
-    const String url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCdkQWVmoOOfSvD4OVlOvuqF2h0N1w03aQ';
+    //Auth signInWithPassword endpoint without the API_KEY.
+    const String urlWithoutApiKey =
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=';
     return _authenticate(
       email,
       password,
-      url,
+      urlWithoutApiKey,
     );
   }
 
