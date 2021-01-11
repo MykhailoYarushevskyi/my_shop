@@ -8,6 +8,7 @@ import '../providers/auth.dart';
 import '../screens/user_products_screen.dart';
 import '../screens/orders_screen.dart';
 import '../screens/products_overview_screen.dart';
+import '../helpers/custom_route.dart';
 
 class AppDrawer extends StatelessWidget {
   Widget _buildListTile({
@@ -96,9 +97,10 @@ class AppDrawer extends StatelessWidget {
             iconData: Icons.payment,
             // iconData: Icons.list_rounded,
             title: 'Orders',
-            tapHandler: () => Navigator.of(context).pushReplacementNamed(
-              OrdersScreen.routeName,
-            ),
+            // tapHandler: () => Navigator.of(context).pushReplacementNamed(
+            //   OrdersScreen.routeName,),
+            tapHandler: () => Navigator.of(context).pushReplacement(
+                CustomRoute(builder: (context) => OrdersScreen())),
           ),
           _buildListTile(
             iconData: Icons.palette,

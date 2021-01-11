@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/helpers/custom_route.dart';
 
 import 'package:provider/provider.dart';
 
@@ -57,6 +58,21 @@ class MyApp extends StatelessWidget {
             accentColor: Colors.deepOrange,
             fontFamily: 'Lato',
             visualDensity: VisualDensity.adaptivePlatformDensity,
+            //we actually have that fade transition for every
+            //route change and if we go to the 'shop' or to the 'orders' or back to the 'shop',
+            //we always have this FadeTransition. So this is how we could change 
+            //the transition for all our routes if we wanted to, here through 
+            //the theme  with the help of the PageTransitionTheme and our own 
+            //PageTransitionBuilder (CustomPageTransitionBuilder) which is very 
+            //similar to our own CustomRoute here, difference is we have one 
+            //extra argument in buildTransitions() method here and we use it for
+            //different purposes. CustomRoute here for single routes on the fly
+            //creation, CustomPageTransitionBuilder here for a general theme 
+            //which affects all route transitions
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android: CustomPageTransitionBuilder(),
+              TargetPlatform.iOS: CustomPageTransitionBuilder(),
+            }),
           ),
 /*           home: auth.isAuth
               ? ProductsOverviewScreen()
@@ -77,25 +93,26 @@ class MyApp extends StatelessWidget {
                     builder: (
                       context,
                       authResultSnapshot,
-                    ) 
-                    // {
-                      // auth
-                      //     .tryAutoLogin()
-                      //     .then((value) => print(
-                      //         '## MyApp auth.tryAutoLogin().then($value)'))
-                      //     .catchError((error) => print(
-                      //         '## MyApp auth.tryAutoLogin().catchError($error)'));
-                      // print(
-                      //     '## MyApp FutureBuilder() authResultSnapshot.connectionState: ${authResultSnapshot.connectionState}');
-                      // print(
-                      //     '## MyApp FutureBuilder() authResultSnapshot.data: ${authResultSnapshot.data}');
-                      // print(
-                      //     '## MyApp FutureBuilder() auth.isAuth: ${auth.isAuth}; auth.UserId: ${auth.userId}; auth.token: ${auth.token}');
-                      // return authResultSnapshot.connectionState ==
-                      => authResultSnapshot.connectionState ==
-                              ConnectionState.waiting
-                          ? SplashScreen()
-                          : AuthScreen()
+                    )
+                        // {
+                        // auth
+                        //     .tryAutoLogin()
+                        //     .then((value) => print(
+                        //         '## MyApp auth.tryAutoLogin().then($value)'))
+                        //     .catchError((error) => print(
+                        //         '## MyApp auth.tryAutoLogin().catchError($error)'));
+                        // print(
+                        //     '## MyApp FutureBuilder() authResultSnapshot.connectionState: ${authResultSnapshot.connectionState}');
+                        // print(
+                        //     '## MyApp FutureBuilder() authResultSnapshot.data: ${authResultSnapshot.data}');
+                        // print(
+                        //     '## MyApp FutureBuilder() auth.isAuth: ${auth.isAuth}; auth.UserId: ${auth.userId}; auth.token: ${auth.token}');
+                        // return authResultSnapshot.connectionState ==
+                        =>
+                        authResultSnapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? SplashScreen()
+                            : AuthScreen()
                     // }
                     ),
             AuthScreen.routeName: (context) => AuthScreen(),
