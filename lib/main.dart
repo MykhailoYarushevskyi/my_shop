@@ -27,7 +27,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => Auth()),
-        // ChangeNotifierProvider(create: (context) => Products()),
+        
+        // ! look there:
+        //https://pub.dev/documentation/provider/latest/provider/ChangeNotifierProxyProvider-class.html
+
         ChangeNotifierProxyProvider<Auth, Products>(
           create: null,
           update: (context, auth, previosProducts) => Products(
@@ -45,8 +48,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(create: (context) => Cart()),
-        // it is possible to use a .value() constructor, it works, but
         // the approach above is better and recommended.
+        // it is possible to use a .value() constructor, it works, but 
+        // strongly not recommended here.
         // ChangeNotifierProvider<Orders>.value(
         //   value: Orders(),),
       ],
