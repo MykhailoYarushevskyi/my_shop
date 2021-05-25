@@ -178,7 +178,7 @@ class _OrderButtonState extends State<OrderButton> {
               }).catchError((error) {
                 showDialog(
                   context: context,
-                  child: AlertDialog(
+                  builder: (context) => AlertDialog(
                     actions: [
                       FlatButton(
                           child: Text('Ok'),

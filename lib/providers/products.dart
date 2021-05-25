@@ -66,7 +66,6 @@ class Products with ChangeNotifier {
     var url =
         'https://my-shop-1362a-default-rtdb.firebaseio.com/products.json?auth=$authToken&$filterString';
     List<Product> _loadedProducts = [];
-
     try {
       //fetch products
       final response = await http.get(url);

@@ -16,7 +16,7 @@ class ProductsGrid extends StatelessWidget {
     // to [watch], but doesn't make widgets rebuild if the value obtained changes).
 
     // final productsData = Provider.of<Products>(context);
-    final MediaQueryData mediaQueryData = MediaQuery.of(context, nullOk: true);
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
     Orientation orientation;
     if (mediaQueryData != null) {
       orientation = mediaQueryData.orientation;
